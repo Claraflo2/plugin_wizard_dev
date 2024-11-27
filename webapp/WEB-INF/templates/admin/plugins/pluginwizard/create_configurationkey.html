@@ -1,0 +1,24 @@
+<@row>
+	<@columns>
+		<@box color='primary'>
+			<@boxHeader title='#i18n{pluginwizard.create_configurationkey.tableLabel}' />
+			<@boxBody>
+				<@tform name='create_configurationkey' id='create_configurationkey' action='jsp/admin/plugins/pluginwizard/DoCreateConfigurationKey.jsp'>
+					<fieldset>
+							<legend class="sr-only">#i18n{pluginwizard.create_configurationkey.tableLabel}</legend>
+							<@formGroup labelFor='configurationkey_keyDescription' labelKey='#i18n{pluginwizard.create_configurationkey.rowTitleConfigurationDescription}' mandatory=true>
+								<@input type='text' id='configurationkey_key_description' name='configurationkey_key_description' maxlength=50 tabIndex='1' />
+							</@formGroup>
+							<@formGroup labelFor='configurationkey_keyValue' labelKey='#i18n{pluginwizard.create_configurationkey.rowTitleConfigurationValue}' mandatory=true>
+								<@input type='text' id='configurationkey_key_value"' name='configurationkey_key_value"' maxlength=50 tabIndex='2' />
+							</@formGroup>
+							<@formGroup>
+								<@button type='submit' tabIndex='3' title='#i18n{pluginwizard.create_configurationkey.buttonValidate}' buttonIcon='check' size='' />
+								<@button type='submit' tabIndex='4' title='#i18n{portal.util.labelCancel}' params='onclick="javascript:history.go(-1)"' value='#i18n{portal.util.labelCancel}' buttonIcon='close' color='btn-secondary' size='' />
+							</@formGroup>
+							</fieldset>
+				</@tform>
+			</@boxBody>
+		</@box>
+	</@columns>
+</@row>

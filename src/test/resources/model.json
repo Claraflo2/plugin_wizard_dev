@@ -1,0 +1,71 @@
+{ 
+  "idPlugin" : 1,
+  "locale" : null,
+  "pluginChanges" : null,
+  "pluginClass" : "fr.paris.lutece.portal.service.plugin.PluginDefaultImplementation",
+  "pluginCopyright" : "Copyright (c) 2013 My Company",
+  "pluginDbPoolRequired" : "1",
+  "pluginDescription" : "My Plugin description",
+  "pluginDocumentation" : null,
+  "pluginIconUrl" : "images/admin/skin/plugins/myplugin/myplugin.png",
+  "pluginInstallation" : null,
+  "pluginName" : "myplugin",
+  "pluginProvider" : "My Company",
+  "pluginProviderUrl" : "http://www.mycompany.com",
+  "pluginUserGuide" : null,
+  "pluginVersion" : "1.0.0",
+
+  "applications" : [ { "applicationClass" : "MyPluginApp",
+        "applicationName" : "myplugin",
+        "idBusinessClasses" : [1],
+        "id" : 1
+      } ],
+          
+  "businessClasses" : [ 
+      { "businessClass" : "Person",
+        "businessTableName" : "myplugin_person",
+        "id" : 1,
+        "attributes" : [ 
+            { "attributeName" : "person_name",
+              "attributeTypeId" : 2,
+              "id" : 1,
+              "maxLength" : 50,
+              "notNull" : true
+            }
+          ],
+        "primaryKey" : "id_person"
+      },
+      { "businessClass" : "Product",
+        "businessTableName" : "myplugin_product",
+        "id" : 2,
+        "attributes" : [ 
+            { "attributeName" : "product_name",
+              "attributeTypeId" : 3,
+              "id" : 1,
+              "maxLength" : 255,
+              "notNull" : true
+            }
+          ],
+
+        "primaryKey" : "id_product"
+      }
+    ],
+  "features" : [ { "featureDescription" : "My Feature description",
+        "featureLevel" : "0",
+        "featureName" : "ManageMyplugin",
+        "featureRight" : "MYPLUGIN_MANAGEMENT",
+        "featureTitle" : "My Feature",
+        "id" : 1,
+        "idBusinessClasses" : [1],
+        "jspName" : null
+      } ],
+  "portlets" : [ { "id" : 1,
+        "portletClass" : "MyPLuginPortlet",
+        "portletTypeName" : "EXAMPLE_PORTLET",
+        "jspBaseName" : "PortletMyPlugin"
+      } ],
+  "rest" : { 
+        "id" : 1,
+        "idBusinessClasses" : [1]
+      }
+}

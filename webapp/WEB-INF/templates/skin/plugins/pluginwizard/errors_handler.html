@@ -1,0 +1,11 @@
+<!-- Errors handling -->
+<#if errors??>
+<#if errors?size &gt; 0 >
+<div class="alert alert-danger">
+    <a class="close" data-dismiss="alert" href="#">x</a>
+    <#list errors as error >
+    <i class="glyphicon glyphicon-exclamation-sign"></i> ${error.message} <br>
+    </#list>
+</div>
+</#if>
+</#if>

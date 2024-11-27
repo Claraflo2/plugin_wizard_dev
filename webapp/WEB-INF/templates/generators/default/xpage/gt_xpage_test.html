@@ -1,0 +1,280 @@
+/*
+ * Copyright (c) 2002-${.now?string('yyyy')}, City of Paris
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ *  1. Redistributions of source code must retain the above copyright notice
+ *     and the following disclaimer.
+ *
+ *  2. Redistributions in binary form must reproduce the above copyright notice
+ *     and the following disclaimer in the documentation and/or other materials
+ *     provided with the distribution.
+ *
+ *  3. Neither the name of 'Mairie de Paris' nor 'Lutece' nor the names of its
+ *     contributors may be used to endorse or promote products derived from
+ *     this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES LOSS OF USE, DATA, OR PROFITS OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ * License 1.0
+ */
+
+package fr.paris.lutece.plugins.${radical_package}.web;
+
+import fr.paris.lutece.portal.service.admin.AccessDeniedException;
+import fr.paris.lutece.test.LuteceTestCase;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.mock.web.MockServletConfig;
+import java.io.IOException;
+<#if business_class??>
+import fr.paris.lutece.portal.service.security.SecurityTokenService;
+import java.util.List;
+import fr.paris.lutece.portal.service.message.SiteMessageException;
+import fr.paris.lutece.portal.web.LocalVariables;
+<#list business_class.attributes as attribute>
+	<#if attribute.type = "Date">
+		<#assign hasDate = true>
+	</#if>
+	<#if attribute.type = "File">
+		<#assign hasFile = true>
+	</#if>
+</#list>
+<#if hasDate?? && hasDate>
+import java.sql.Date;
+import fr.paris.lutece.util.date.DateUtil;
+import fr.paris.lutece.portal.web.l10n.LocaleService;
+</#if>
+<#if hasFile?? && hasFile>
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import java.util.ArrayList;
+import org.apache.commons.fileupload.FileItem;
+import fr.paris.lutece.portal.business.file.File;
+import fr.paris.lutece.portal.web.upload.MultipartHttpServletRequest;
+import java.util.HashMap;
+import java.util.Map;
+</#if>
+import fr.paris.lutece.plugins.${radical_package}.business.${business_class.businessClass};
+import fr.paris.lutece.plugins.${radical_package}.business.${business_class.businessClass}Home;
+/**
+ * This is the business class test for the object ${business_class.businessClass}
+ */
+public class ${business_class.businessClass}XPageTest extends LuteceTestCase
+{
+<#list business_class.attributes as attribute>
+<#--  attributeTypeId 5 corresponds to email type -->
+<#if attribute.attributeTypeId = 5>
+	private static final ${attribute.type} ${attribute.name?upper_case}1 = "${attribute.name?lower_case}1@test.com";
+    private static final ${attribute.type} ${attribute.name?upper_case}2 = "${attribute.name?lower_case}2@test.com";
+<#--  attributeTypeId 6 corresponds to url type -->
+<#elseif attribute.attributeTypeId = 6>
+	private static final ${attribute.type} ${attribute.name?upper_case}1 = "http://${attribute.name?lower_case}1.com";
+    private static final ${attribute.type} ${attribute.name?upper_case}2 = "http://${attribute.name?lower_case}2.com";
+<#elseif attribute.type = "String"> 
+    private static final ${attribute.type} ${attribute.name?upper_case}1 = "${attribute.name}1";
+    private static final ${attribute.type} ${attribute.name?upper_case}2 = "${attribute.name}2";
+<#elseif attribute.type = "boolean">
+	private static final ${attribute.type} ${attribute.name?upper_case}1 = true;
+    private static final ${attribute.type} ${attribute.name?upper_case}2 = false;
+<#elseif attribute.type = "Date">
+	private static final ${attribute.type} ${attribute.name?upper_case}1 = new Date( 1000000l );
+    private static final ${attribute.type} ${attribute.name?upper_case}2 = new Date( 2000000l );
+<#elseif attribute.type = "File">
+	private static final ${attribute.type} ${attribute.name?upper_case}1 = new File( );
+    private static final ${attribute.type} ${attribute.name?upper_case}2 = new File( );
+<#else>
+    private static final ${attribute.type} ${attribute.name?upper_case}1 = 1;
+    private static final ${attribute.type} ${attribute.name?upper_case}2 = 2;
+</#if>
+</#list>
+
+public void testXPage(  ) throws AccessDeniedException, IOException
+	{
+        // Xpage create test
+        MockHttpServletRequest request = new MockHttpServletRequest( );
+		MockHttpServletResponse response = new MockHttpServletResponse( );
+		MockServletConfig config = new MockServletConfig( );
+
+		${business_class.instanceName?cap_first}XPage xpage = new ${business_class.instanceName?cap_first}XPage( );
+		assertNotNull( xpage.getCreate${business_class.instanceName?cap_first}( request ) );
+		
+		request = new MockHttpServletRequest();
+		request.addParameter( "token", SecurityTokenService.getInstance( ).getToken( request, "create${business_class.instanceName?cap_first}" ));
+		
+		LocalVariables.setLocal(config, request, response);
+		
+		<#if hasFile?? && hasFile>
+		Map<String, String [ ]> parameters = new HashMap<>( );
+        parameters.put( "token", new String [ ] {
+        		SecurityTokenService.getInstance( ).getToken( request, "create${business_class.instanceName?cap_first}" )
+        } );
+        parameters.put( "action", new String [ ] {
+        		"create${business_class.instanceName?cap_first}"
+        } );
+        <#list business_class.attributes as attribute>
+        <#if attribute.type != "File">
+        parameters.put( "${attribute.paramName}", new String [ ] {
+		<#if attribute.type = "String">
+        ${attribute.name?upper_case}1
+        <#elseif attribute.type = "Date">
+        DateUtil.getDateString( ${attribute.name?upper_case}1, LocaleService.getDefault( ) )
+        <#else>
+        String.valueOf( ${attribute.name?upper_case}1)
+        </#if>
+        } );
+        </#if>
+		</#list>
+        
+        Map<String, List<FileItem>> multipartFiles = new HashMap<>( );
+        
+        List<FileItem> items = new ArrayList<>( );
+        
+        <#list business_class.attributes as attribute>
+		<#if attribute.type = "File">
+        FileItem ${attribute.paramName} = new DiskFileItemFactory( ).createItem( "${attribute.paramName}", "text/plain", true, "${attribute.paramName}" );
+        ${attribute.paramName}.getOutputStream( ).write( "something".getBytes( ) );
+        items.add( ${attribute.paramName} );
+        multipartFiles.put( "${attribute.paramName}", items );
+        </#if>
+		</#list>
+
+        MultipartHttpServletRequest requestMultipart = new MultipartHttpServletRequest(request, multipartFiles, parameters);
+
+        assertNotNull( xpage.doCreate${business_class.instanceName?cap_first}( requestMultipart ) );
+		<#else>
+		request.addParameter( "action" , "create${business_class.instanceName?cap_first}" );
+		<#list business_class.attributes as attribute>
+		<#if attribute.type = "String">
+        request.addParameter( "${attribute.paramName}" , ${attribute.name?upper_case}1 );
+        <#elseif attribute.type = "Date">
+        request.addParameter( "${attribute.paramName}" , DateUtil.getDateString( ${attribute.name?upper_case}1, LocaleService.getDefault( ) ) );
+        <#else>
+        request.addParameter( "${attribute.paramName}" , String.valueOf( ${attribute.name?upper_case}1) );
+        </#if>
+		</#list>
+		request.setMethod( "POST" );
+		
+		assertNotNull( xpage.doCreate${business_class.instanceName?cap_first}( request ) );
+		</#if>
+		
+		
+		//modify ${business_class.businessClass}	
+		List<Integer> listIds = ${business_class.businessClass}Home.getId${business_class.businessClass}sList(); 
+
+		assertTrue( !listIds.isEmpty( ) );
+
+		request = new MockHttpServletRequest();
+		request.addParameter( "id", String.valueOf( listIds.get( 0 ) ) );
+
+		assertNotNull( xpage.getModify${business_class.businessClass}( request ) );
+
+		response = new MockHttpServletResponse();
+		request = new MockHttpServletRequest();
+		LocalVariables.setLocal(config, request, response);
+		
+		<#if hasFile?? && hasFile>
+		parameters = new HashMap<>( );
+        parameters.put( "token", new String [ ] {
+        		SecurityTokenService.getInstance( ).getToken( request, "modify${business_class.businessClass}" )
+        } );
+        parameters.put( "id", new String [ ] {
+        		String.valueOf( listIds.get( 0 ) )
+        } );
+        <#list business_class.attributes as attribute>
+        <#if attribute.type != "File">
+        parameters.put( "${attribute.paramName}", new String [ ] {
+		<#if attribute.type = "String">
+        ${attribute.name?upper_case}1
+        <#elseif attribute.type = "Date">
+        DateUtil.getDateString( ${attribute.name?upper_case}1, LocaleService.getDefault( ) )
+        <#else>
+        String.valueOf( ${attribute.name?upper_case}1)
+        </#if>
+        } );
+        </#if>
+		</#list>
+
+        requestMultipart = new MultipartHttpServletRequest(request, new HashMap<>( ), parameters);
+
+        assertNotNull( xpage.doModify${business_class.businessClass}( requestMultipart ) );
+		<#else>
+		<#list business_class.attributes as attribute>
+		<#if attribute.type = "String">
+        request.addParameter( "${attribute.paramName}" , ${attribute.name?upper_case}2 );
+        <#elseif attribute.type = "Date">
+        request.addParameter( "${attribute.paramName}" , DateUtil.getDateString( ${attribute.name?upper_case}2, LocaleService.getDefault( ) ) );
+        <#else>
+        request.addParameter( "${attribute.paramName}" , String.valueOf( ${attribute.name?upper_case}2) );
+        </#if>
+		</#list>
+
+		request.addParameter( "token", SecurityTokenService.getInstance( ).getToken( request, "modify${business_class.businessClass}" ));
+		request.addParameter( "id", String.valueOf( listIds.get( 0 ) ) );
+		
+		assertNotNull( xpage.doModify${business_class.businessClass}( request ) );
+		</#if>
+
+		//do confirm remove ${business_class.businessClass}
+		request = new MockHttpServletRequest();
+		request.addParameter( "action" , "confirmRemove${business_class.businessClass}" );
+		request.addParameter( "id", String.valueOf( listIds.get( 0 ) ) );
+		request.addParameter( "token", SecurityTokenService.getInstance( ).getToken( request, "confirmRemove${business_class.businessClass}" ));;
+		request.setMethod("GET");
+
+		try
+		{
+			xpage.getConfirmRemove${business_class.businessClass}( request );
+		}
+		catch(Exception e)
+		{
+			assertTrue(e instanceof SiteMessageException);
+		}
+
+		//do remove ${business_class.businessClass}
+		response = new MockHttpServletResponse();
+		request = new MockHttpServletRequest();
+		LocalVariables.setLocal(config, request, response);
+		request.addParameter( "action" , "remove${business_class.businessClass}" );
+		request.addParameter( "token", SecurityTokenService.getInstance( ).getToken( request, "remove${business_class.businessClass}" ));
+		request.addParameter( "id", String.valueOf( listIds.get( 0 ) ) );
+		assertNotNull( xpage.doRemove${business_class.businessClass}( request ) );
+
+    }
+    
+}
+<#else>
+import fr.paris.lutece.plugins.${radical_package}.business.${plugin_application.applicationName};
+import fr.paris.lutece.plugins.${radical_package}.business.${plugin_application.applicationName}Home;
+/**
+ * This is the application class test for the object ${plugin_application.applicationName}
+ */
+public class ${plugin_application.applicationName}AppTest extends LuteceTestCase
+{
+
+
+public void testXPage(  ) throws AccessDeniedException
+    {
+        // Xpage create test
+        MockHttpServletRequest request = new MockHttpServletRequest( );
+        MockHttpServletResponse response = new MockHttpServletResponse( );
+        MockServletConfig config = new MockServletConfig( );
+        ${plugin_application.applicationName}App xPageTest = new ${plugin_application.applicationName}App( );
+
+        assertNotNull( xPageTest.viewHome( request ) );
+    }
+    
+}
+</#if>

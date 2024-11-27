@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<#if plugin.module = true>
+	<#assign url= plugin.pluginName?split("-")[0]+".modules."+plugin.pluginName?split("-")[1]/>
+<#else>
+	<#assign url= plugin.pluginName >
+</#if>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd" >
+
+<#if plugin.businessClasses?? && plugin.businessClasses?has_content >
+<#list plugin.businessClasses as business_class>
+    <bean id="${plugin.pluginName}.${business_class.businessClass?uncap_first}DAO" class="fr.paris.lutece.plugins.${url}.business.${business_class.businessClass?cap_first}DAO" />
+    <#if plugin.getRest().getIdBusinessClasses()?? && plugin.getRest().getIdBusinessClasses()?has_content>
+    <#list plugin.getRest().getIdBusinessClasses() as id_business_class>
+    <#if id_business_class == business_class.getId() >
+    <bean id="${plugin.pluginName}.${business_class.businessClass?uncap_first}Rest" class="fr.paris.lutece.plugins.${url}.rs.${business_class.businessClass?cap_first}Rest" />
+    </#if>
+    </#list>
+    </#if>
+</#list>
+</#if>
+
+<#if plugin.getRest().getIdBusinessClasses()?? && plugin.getRest().getIdBusinessClasses()?has_content>
+    <bean id="${plugin.pluginName}.swaggerRest" class="fr.paris.lutece.plugins.${url}.rs.SwaggerRest" />
+</#if>
+
+<#list plugin.portlets as portlet>
+<#if portlet?? >
+    <bean id="${plugin.pluginName}.${portlet.portletClass}DAO" class="fr.paris.lutece.plugins.${url}.business.portlet.${portlet.portletClass}DAO" />    
+</#if>    
+</#list>
+</beans>
